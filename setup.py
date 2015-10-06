@@ -7,7 +7,7 @@ with open(os.path.join(here, 'README.rst')) as f:
 
 setup(
     name='score.svg',
-    version='0.1.1',
+    version='0.1.2',
     description='Helpers for managing svg icons with The SCORE Framework',
     long_description=README,
     author='strg.at',
@@ -15,6 +15,8 @@ setup(
     url='http://score-framework.org',
     keywords='score framework web svg icons',
     packages=['score.svg'],
+    namespace_packages=['score'],
+    zip_safe=False,
     license='LGPL',
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -31,7 +33,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
     include_package_data=True,
-    zip_safe=False,
     install_requires=[
         'score.webassets >= 0.1',
         'Pillow',
