@@ -7,7 +7,7 @@ with open(os.path.join(here, 'README.rst')) as f:
 
 setup(
     name='score.svg',
-    version='0.1.2',
+    version='0.1.3',
     description='Helpers for managing svg icons with The SCORE Framework',
     long_description=README,
     author='strg.at',
