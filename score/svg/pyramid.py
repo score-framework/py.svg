@@ -133,7 +133,6 @@ class ConfiguredSvgPyramidModule(ConfiguredSvgModule):
         Returns a pyramid response object with the optional *svg* string as its
         body. Will only set the headers, if *svg* is `None`.
         """
-        request.response.content_encoding = 'UTF-8'
         request.response.content_type = 'image/svg+xml; charset=UTF-8'
         if svg:
             request.response.text = svg
