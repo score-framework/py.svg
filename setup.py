@@ -14,7 +14,7 @@ setup(
     author_email='score@strg.at',
     url='http://score-framework.org',
     keywords='score framework web svg icons',
-    packages=['score.svg'],
+    packages=['score', 'score.svg'],
     namespace_packages=['score'],
     zip_safe=False,
     license='LGPL',
