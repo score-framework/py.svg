@@ -101,15 +101,15 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
         if self.combine:
             @self.css.virtcss
             def icons(ctx):
-                svgurl = self.url_sprite_svg()
-                pngurl = self.url_sprite_png()
-                return self.sprite.css(svgurl, pngurl)
+                svgurl = ctx.url('score.svg:combined/svg')
+                pngurl = ctx.url('score.svg:combined/png')
+                return self.sprite(ctx).css(svgurl, pngurl)
         else:
             @self.css.virtcss
             def icons(ctx):
                 styles = [Svg.common_css]
                 for path in self.paths():
-                    svg = self.svg(path)
+                    svg = self.svg(ctx, path)
                     svgurl = ctx.url('score.svg:single/svg', path)
                     pngurl = ctx.url('score.svg:single/png', path)
                     styles.append('.icon-%s{%s}' %
@@ -120,13 +120,13 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
         if '.' not in path:
             path += '.svg'
         if self.combine:
-            styles = self.sprite.svg_css(path, size)
+            styles = self.sprite(ctx).svg_css(path, size)
             return '<span class="icon icon-%s" style="%s"></span>' % \
                 (Svg.path2css(path), styles)
         if path in self.virtfiles.paths():
-            svg = Svg(path, string=self.virtfiles.render(path))
+            svg = Svg(ctx, path, string=self.virtfiles.render(ctx, path))
         else:
-            svg = Svg(path, string=self.render_svg(path))
+            svg = Svg(ctx, path, string=self.render_svg(ctx, path))
         if not size:
             return '<span class="icon icon-%s"></span>' % svg.css_class
         svgurl = ctx.url('score.svg:single/svg', path)
@@ -141,7 +141,7 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
         if self.combine and not size:
             svgurl = ctx.url('score.svg:combined/svg')
             pngurl = ctx.url('score.svg:combined/png')
-            css = self.sprite.svg_css(path)
+            css = self.sprite(ctx).svg_css(path)
             css += 'background:url(%s)no-repeat;' % pngurl
             css += 'background-image:url(%s),none;' % svgurl
             css += 'display:inline-block;'
@@ -149,9 +149,9 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
             svgurl = ctx.url('score.svg:single/svg', path)
             pngurl = ctx.url('score.svg:single/png', path)
             if path in self.virtfiles.paths():
-                svg = Svg(path, string=self.virtfiles.render(path))
+                svg = Svg(ctx, path, string=self.virtfiles.render(ctx, path))
             else:
-                svg = Svg(path, string=self.render_svg(path))
+                svg = Svg(ctx, path, string=self.render_svg(ctx, path))
             if size:
                 return svg.css_resized(svgurl, pngurl, size)
             else:
@@ -175,7 +175,7 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
             if versionmanager.handle_request(ctx, 'svg', path):
                 return self._svg_response(ctx)
             path = self._urlpath2path(path)
-            svg = self.render_svg(path)
+            svg = self.render_svg(ctx, path)
             return self._svg_response(ctx, svg)
 
         @single_svg.vars2url
@@ -185,7 +185,7 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
             """
             urlpath = self._path2urlpath(path)
             url = '/svg/%s.svg' % urllib.parse.quote(urlpath)
-            renderer = lambda: self.render_svg(path).encode('UTF-8')
+            renderer = lambda: self.render_svg(ctx, path).encode('UTF-8')
             versionmanager = self.webassets.versionmanager
             if path in self.virtfiles.paths():
                 hasher = lambda: self.virtfiles.hash(path)
@@ -205,7 +205,7 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
             if versionmanager.handle_request(ctx, 'png', path):
                 return self._png_response(ctx)
             path = self._urlpath2path(path)
-            png = self.render_png(path)
+            png = self.render_png(ctx, path)
             return self._png_response(ctx, png)
 
         @single_png.vars2url
@@ -213,7 +213,7 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
             urlpath = self._path2urlpath(path)
             urlpath = urlpath[:-3] + 'png'
             url = '/svg/%s.png' % urllib.parse.quote(urlpath)
-            renderer = lambda: self.render_png(path)
+            renderer = lambda: self.render_png(ctx, path)
             versionmanager = self.webassets.versionmanager
             if path in self.virtfiles.paths():
                 hasher = lambda: self.virtfiles.hash(path)
@@ -236,7 +236,7 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
                                              os.path.join(size, path)):
                 return self._png_response(ctx)
             path = self._urlpath2path(path)
-            png = self.render_png(path, size)
+            png = self.render_png(ctx, path, size)
             return self._png_response(ctx, png)
 
         @single_png_resized.vars2url
@@ -245,7 +245,7 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
             urlpath = urlpath[:-3] + 'png'
             url = '/svg/%s/%s.png' % (urllib.parse.quote(size),
                                       urllib.parse.quote(urlpath))
-            renderer = lambda: self.render_png(path, size)
+            renderer = lambda: self.render_png(ctx, path, size)
             versionmanager = self.webassets.versionmanager
             if path in self.virtfiles.paths():
                 hasher = lambda: self.virtfiles.hash(path)
@@ -260,12 +260,12 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
 
     def _add_combined_svg_route(self):
 
-        @self.http.newroute('score.css:combined/svg', '/combined.svg')
+        @self.http.newroute('score.svg:combined/svg', '/combined.svg')
         def svg_combined(ctx):
             versionmanager = self.webassets.versionmanager
             if versionmanager.handle_request(ctx, 'svg', '__combined__'):
                 return self._svg_response(ctx)
-            return self._svg_response(ctx, self.render_svg_sprite())
+            return self._svg_response(ctx, self.render_svg_sprite(ctx))
 
         @svg_combined.vars2url
         def url_svg_combined(ctx):
@@ -277,24 +277,24 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
                     vfiles.append(path)
                 else:
                     files.append(os.path.join(self.rootdir, path))
-            versionmanager = self.webconf.versionmanager
+            versionmanager = self.webassets.versionmanager
             hashers = [versionmanager.create_file_hasher(files)]
             hashers += [lambda path: self.virtfiles.hash(path) for path in vfiles]
             hash_ = versionmanager.store(
                 'svg', '__combined__', hashers,
-                lambda: self.render_svg_sprite().encode('UTF-8'))
+                lambda: self.render_svg_sprite(ctx).encode('UTF-8'))
             if hash_:
                 url += '?_v=' + hash_
             return url
 
     def _add_combined_png_route(self):
 
-        @self.http.newroute('score.css:combined/png', '/combined.png')
+        @self.http.newroute('score.svg:combined/png', '/combined.png')
         def png_combined(ctx):
             versionmanager = self.webassets.versionmanager
             if versionmanager.handle_request(ctx, 'png', '__combined__'):
                 return self.png_response(ctx)
-            return self.png_response(ctx, self.render_png_sprite())
+            return self.png_response(ctx, self.render_png_sprite(ctx))
 
         @png_combined.vars2url
         def url_png_combined(ctx):
@@ -306,12 +306,12 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
                     vfiles.append(path)
                 else:
                     files.append(os.path.join(self.rootdir, path))
-            versionmanager = self.webconf.versionmanager
+            versionmanager = self.webassets.versionmanager
             hashers = [versionmanager.create_file_hasher(files)]
             hashers += [lambda path: self.virtfiles.hash(path) for path in vfiles]
             hash_ = versionmanager.store(
                 'png', '__combined__', hashers,
-                lambda: self.render_svg_sprite().encode('UTF-8'))
+                lambda: self.render_svg_sprite(ctx).encode('UTF-8'))
             if hash_:
                 url += '?_v=' + hash_
             return url
@@ -386,48 +386,47 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
         """
         return self.tpl.renderer.paths('svg', self.virtfiles, includehidden)
 
-    @property
-    def sprite(self):
+    def sprite(self, ctx):
         """
         Provides the :class:`.Sprite` object for this configuration.
         """
-        return Sprite(self)
+        return Sprite(ctx, self)
 
-    def svg(self, path):
+    def svg(self, ctx, path):
         """
         Provides an :class:`.Svg` object for given path. Caching behaviour is
         the same as in :attr:`.sprite`.
         """
         if path.endswith('.svg'):
-            return Svg(path, file=os.path.join(self.rootdir, path))
-        return Svg(path, string=self.tpl.renderer.render_file(path))
+            return Svg(ctx, path, file=os.path.join(self.rootdir, path))
+        return Svg(ctx, path, string=self.tpl.renderer.render_file(ctx, path))
 
-    def render_svg(self, path):
+    def render_svg(self, ctx, path):
         """
         Retuns the content of the file denoted by :term:`path <asset path>`.
         """
-        return self.svg(path).content
+        return self.svg(ctx, path).content
 
-    def render_png(self, path, size=None):
+    def render_png(self, ctx, path, size=None):
         """
         Renders the svg file with given :term:`path <asset path>` in the
         Portable Network Graphics (png) file format.
         """
-        return svg2png(self.svg(path), size)
+        return svg2png(self.svg(ctx, path), size)
 
-    def render_svg_sprite(self):
+    def render_svg_sprite(self, ctx):
         """
         Renders the :term:`sprite` of this configuration in the svg file
         format.
         """
-        return self.sprite.content
+        return self.sprite(ctx).content
 
-    def render_png_sprite(self, size=None):
+    def render_png_sprite(self, ctx, size=None):
         """
         Same as :meth:`.render_svg_sprite`, but returns a png, thus a `bytes`
         object.
         """
-        return svg2png(self.sprite, size)
+        return svg2png(self.sprite(ctx), size)
 
     convert_file = render_svg
 
@@ -480,9 +479,10 @@ class Svg:
     def path2css(path):
         return path[:path.find('.')].replace('/', '-')
 
-    def __init__(self, path, *, file=None, string=None):
+    def __init__(self, ctx, path, *, file=None, string=None):
         assert file or string
         assert not (file and string)
+        self.ctx = ctx
         self.file = file
         self.string = string
         self.path = path
@@ -597,7 +597,8 @@ class Sprite:
     X
     """
 
-    def __init__(self, conf):
+    def __init__(self, ctx, conf):
+        self.ctx = ctx
         self.conf = conf
         if self._load_cache():
             return
@@ -606,7 +607,7 @@ class Sprite:
         offset = 0
         self.height = 0
         for path in self.conf.paths():
-            svg = Svg(path, file=os.path.join(conf.rootdir, path))
+            svg = Svg(ctx, path, file=os.path.join(conf.rootdir, path))
             self.svg_dimensions[path] = (svg.height, svg.width)
             self.svg_offsets[path] = offset
             offset -= svg.width
@@ -656,7 +657,8 @@ class Sprite:
     def svg_css(self, path, size=None):
         wmult, hmult = 1, 1
         if size:
-            svg = Svg(path, file=os.path.join(self.conf.rootdir, path))
+            svg = Svg(self.ctx, path,
+                      file=os.path.join(self.conf.rootdir, path))
             wmult, hmult = svg.wh_multipliers(size)
         dim = self.svg_dimensions[path]
         w, h = dim[1] * wmult, dim[0] * hmult
@@ -685,8 +687,8 @@ class Sprite:
         result.set('width', str(self.width))
         result.set('height', str(self.height))
         for path in self.conf.paths():
-            svg = self.conf.tpl.renderer.render_file(path)
-            svg = Svg(path, string=svg)
+            svg = self.conf.tpl.renderer.render_file(self.ctx, path)
+            svg = Svg(self.ctx, path, string=svg)
             root = svg.xml_root()
             root.attrib['id'] = svg.css_class
             if self.svg_offsets[path]:
