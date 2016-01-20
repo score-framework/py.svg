@@ -158,14 +158,14 @@ class ConfiguredSvgModule(ConfiguredModule, TemplateConverter):
                 return svg.css(svgurl, pngurl)
         return css
 
-    def _finalize(self, score):
-        self.tpl.renderer.add_function('scss', 'icon',
-                                       self.icon_css, escape_output=False)
-        self.tpl.renderer.add_function('css', 'icon',
-                                       self.icon_css, escape_output=False)
+    def _finalize(self, tpl):
+        tpl.renderer.add_function('scss', 'icon',
+                                  self.icon_css, escape_output=False)
+        tpl.renderer.add_function('css', 'icon',
+                                  self.icon_css, escape_output=False)
         if 'html' in self.tpl.renderer.formats:
-            self.tpl.renderer.add_function('html', 'icon',
-                                           self.icon, escape_output=False)
+            tpl.renderer.add_function('html', 'icon',
+                                      self.icon, escape_output=False)
 
     def _add_single_svg_route(self):
 
