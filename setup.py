@@ -34,7 +34,8 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        'score.webassets >= 0.1',
+        'score.webassets >= 0.2',
+        'score.css >= 0.2',
         'Pillow',
         'CairoSVG',
     ],
