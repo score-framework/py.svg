@@ -7,7 +7,7 @@ with open(os.path.join(here, 'README.rst')) as f:
 
 setup(
     name='score.svg',
-    version='0.2',
+    version='0.2.1',
     description='Helpers for managing svg icons with The SCORE Framework',
     long_description=README,
     author='strg.at',
@@ -34,8 +34,8 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        'score.webassets >= 0.2',
-        'score.css >= 0.2',
+        'score.webassets >= 0.2.1',
+        'score.css >= 0.2.1',
         'Pillow',
         'CairoSVG',
     ],
