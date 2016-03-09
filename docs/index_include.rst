@@ -159,24 +159,3 @@ Configuration
         render_png,
         render_svg_sprite,
         render_png_sprite
-
-
-.. _svg_pyramid:
-
-Pyramid Integration
-===================
-
-The package ``score.tpl.pyramid`` :ref:`integrates <framework_integration>`
-this module with pyramid.
-
-.. autofunction:: score.svg.pyramid.init
-
-.. autoclass:: score.svg.pyramid.ConfiguredSvgPyramidModule()
-    :members:
-        url_single_svg,
-        url_single_png,
-        url_single_png_resized,
-        url_sprite_svg,
-        url_sprite_png
-
-
