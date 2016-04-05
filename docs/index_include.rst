@@ -43,12 +43,6 @@ Valid values for this parameter are:
 Icons
 -----
 
-.. note::
-    This feature is only available in the :ref:`framework-specific
-    <framework_integration>` parts of this module, as it needs the URLs to
-    certain resources. The :ref:`pyramid integration <svg_pyramid>` will
-    provide this feature, for example.
-
 The :mod:`score.svg` module provides various convenience functions for
 displaying svg images in web pages.
 
@@ -117,12 +111,6 @@ instead look like the following::
 
 Sprite generation
 -----------------
-
-.. note::
-    This feature is only available in the :ref:`framework-specific
-    <framework_integration>` parts of this module, as it needs the URLs to
-    certain resources. The :ref:`pyramid integration <svg_pyramid>` will
-    provide this feature, for example.
 
 In order to provide a faster experience for users, this module can generate
 a :term:`sprite` containing all available svg images. The registered functions
